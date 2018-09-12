@@ -355,19 +355,19 @@ func taskReady(ctx *context, jobName string, taskNum int) wait.ConditionFunc {
 				!metav1.IsControlledBy(&pod, queueJob) {
 				continue
 			}
+			fmt.Printf("pod: %v \n", pod)
 			if pod.Status.Phase == v1.PodRunning || pod.Status.Phase == v1.PodSucceeded {
-				fmt.Printf("pod.Status.Phase: %v", pod.Status.Phase)
+				fmt.Printf("pod.Status.Phase: %v \n", pod.Status.Phase)
 				readyTaskNum++
 			}
-
 		}
 
 		if taskNum < 0 {
 			taskNum = int(pg.Spec.NumMember)
 		}
 
-		fmt.Printf("taskNum: %v", taskNum)
-		fmt.Printf("readyTaskNum: %v", readyTaskNum)
+		fmt.Printf("taskNum: %v \n", taskNum)
+		fmt.Printf("readyTaskNum: %v \n", readyTaskNum)
 
 		return taskNum <= readyTaskNum, nil
 	}
