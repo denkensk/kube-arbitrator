@@ -39,6 +39,7 @@ import (
 	arbv1 "github.com/kubernetes-incubator/kube-arbitrator/pkg/apis/scheduling/v1alpha1"
 	"github.com/kubernetes-incubator/kube-arbitrator/pkg/client/clientset/versioned"
 	arbapi "github.com/kubernetes-incubator/kube-arbitrator/pkg/scheduler/api"
+	"fmt"
 )
 
 var oneMinute = 1 * time.Minute
@@ -355,6 +356,7 @@ func taskReady(ctx *context, jobName string, taskNum int) wait.ConditionFunc {
 				continue
 			}
 			if pod.Status.Phase == v1.PodRunning || pod.Status.Phase == v1.PodSucceeded {
+				fmt.Printf("pod.Status.Phase: %v", pod.Status.Phase)
 				readyTaskNum++
 			}
 
@@ -363,6 +365,9 @@ func taskReady(ctx *context, jobName string, taskNum int) wait.ConditionFunc {
 		if taskNum < 0 {
 			taskNum = int(pg.Spec.NumMember)
 		}
+
+		fmt.Printf("taskNum: %v", taskNum)
+		fmt.Printf("readyTaskNum: %v", readyTaskNum)
 
 		return taskNum <= readyTaskNum, nil
 	}
