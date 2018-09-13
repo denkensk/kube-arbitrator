@@ -82,6 +82,7 @@ func initTestContext() *context {
 		queues:    []string{"q1", "q2", "test"},
 	}
 
+	namespaces := []string{"n1", "n2", "test"}
 	home := homeDir()
 	Expect(home).NotTo(Equal(""))
 
@@ -91,13 +92,15 @@ func initTestContext() *context {
 	cxt.karclient = versioned.NewForConfigOrDie(config)
 	cxt.kubeclient = kubernetes.NewForConfigOrDie(config)
 
-	_, err = cxt.kubeclient.CoreV1().Namespaces().Create(&v1.Namespace{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      cxt.namespace,
-			Namespace: cxt.namespace,
-		},
-	})
-	Expect(err).NotTo(HaveOccurred())
+	for _, ns := range namespaces {
+		_, err = cxt.kubeclient.CoreV1().Namespaces().Create(&v1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      ns,
+				Namespace: ns,
+			},
+		})
+		Expect(err).NotTo(HaveOccurred())
+	}
 
 	for _, q := range cxt.queues {
 		_, err = cxt.karclient.Scheduling().Queues().Create(&arbv1.Queue{
@@ -246,7 +249,7 @@ func createJobWithOptions(context *context,
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      jn,
-			Namespace: context.namespace,
+			Namespace: jns,
 		},
 		Spec: batchv1.JobSpec{
 			Parallelism: &rep,
@@ -269,7 +272,7 @@ func createJobWithOptions(context *context,
 	pg := &arbv1.PodGroup{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      jn,
-			Namespace: context.namespace,
+			Namespace: jns,
 		},
 		Spec: arbv1.PodGroupSpec{
 			NumMember: min,
@@ -335,16 +338,16 @@ func deleteReplicaSet(ctx *context, name string) error {
 }
 
 func taskReady(ctx *context, jobName string, taskNum int) wait.ConditionFunc {
-	_, jn := splictJobName(ctx, jobName)
+	jns, jn := splictJobName(ctx, jobName)
 
 	return func() (bool, error) {
-		queueJob, err := ctx.kubeclient.BatchV1().Jobs(ctx.namespace).Get(jn, metav1.GetOptions{})
+		queueJob, err := ctx.kubeclient.BatchV1().Jobs(jns).Get(jn, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 
-		pods, err := ctx.kubeclient.CoreV1().Pods(ctx.namespace).List(metav1.ListOptions{})
+		pods, err := ctx.kubeclient.CoreV1().Pods(jns).List(metav1.ListOptions{})
 		Expect(err).NotTo(HaveOccurred())
 
-		pg, err := ctx.karclient.Scheduling().PodGroups(ctx.namespace).Get(jn, metav1.GetOptions{})
+		pg, err := ctx.karclient.Scheduling().PodGroups(jns).Get(jn, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 
 		readyTaskNum := 0
