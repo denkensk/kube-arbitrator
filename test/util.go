@@ -79,7 +79,7 @@ func splictJobName(cxt *context, jn string) (string, string) {
 func initTestContext() *context {
 	cxt := &context{
 		namespaces: []string{"test", "n1", "n2"},
-		queues:   []string{"q1", "q2", "test"},
+		queues:     []string{"q1", "q2", "test"},
 	}
 
 	home := homeDir()
