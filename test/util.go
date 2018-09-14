@@ -83,6 +83,7 @@ func splictJobName(cxt *context, jn string) (string, string, string) {
 func initTestContext() *context {
 	enableNamespaceAsQueue, _ := strconv.ParseBool(os.Getenv("ENABLE_NAMESPACES_AS_QUEUE"))
 	cxt := &context{}
+
 	home := homeDir()
 	Expect(home).NotTo(Equal(""))
 
