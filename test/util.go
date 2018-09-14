@@ -83,13 +83,7 @@ func splictJobName(cxt *context, jn string) (string, string, string) {
 
 func initTestContext() *context {
 	enableNamespaceAsQueue, _ := strconv.ParseBool(os.Getenv("ENABLE_NAMESPACES_AS_QUEUE"))
-
-	fmt.Printf("enableNamespaceAsQueue-1: %v", enableNamespaceAsQueue)
 	cxt := &context{}
-	//cxt := &context{
-	//	namespaces: []string{"test", "n1", "n2"},
-	//	queues:   []string{"q1", "q2", "test"},
-	//}
 	home := homeDir()
 	Expect(home).NotTo(Equal(""))
 
@@ -106,8 +100,7 @@ func initTestContext() *context {
 		cxt.queues = []string{"test", "n1", "n2"}
 	}
 	cxt.enableNamespaceAsQueue = enableNamespaceAsQueue
-	fmt.Printf("enableNamespaceAsQueue-2: %v", enableNamespaceAsQueue)
-
+	
 	for _, ns := range cxt.namespaces {
 		_, err = cxt.kubeclient.CoreV1().Namespaces().Create(&v1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
