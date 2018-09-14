@@ -39,6 +39,8 @@ import (
 	arbv1 "github.com/kubernetes-incubator/kube-arbitrator/pkg/apis/scheduling/v1alpha1"
 	"github.com/kubernetes-incubator/kube-arbitrator/pkg/client/clientset/versioned"
 	arbapi "github.com/kubernetes-incubator/kube-arbitrator/pkg/scheduler/api"
+	"strconv"
+	"fmt"
 )
 
 var oneMinute = 1 * time.Minute
@@ -65,23 +67,31 @@ type context struct {
 
 	namespaces []string
 	queues     []string
+	enableNamespaceAsQueue bool
 }
 
-func splictJobName(cxt *context, jn string) (string, string) {
+func splictJobName(cxt *context, jn string) (string, string, string) {
 	nss := strings.Split(jn, "/")
 	if len(nss) == 1 {
-		return cxt.namespaces[0], nss[0]
+		return cxt.namespaces[0], nss[0], cxt.namespaces[0]
 	}
-
-	return nss[0], nss[1]
+	if !cxt.enableNamespaceAsQueue {
+		return cxt.namespaces[0], nss[0], nss[1]
+	}
+	return nss[0], nss[1], nss[0]
 }
 
 func initTestContext() *context {
-	cxt := &context{
-		namespaces: []string{"test", "n1", "n2"},
-		queues:   []string{"q1", "q2", "test"},
+	enableNamespaceAsQueue, err := strconv.ParseBool(os.Args[0])
+	if err != nil {
+		fmt.Printf("error: %v", err)
 	}
 
+	cxt := &context{}
+	//cxt := &context{
+	//	namespaces: []string{"test", "n1", "n2"},
+	//	queues:   []string{"q1", "q2", "test"},
+	//}
 	home := homeDir()
 	Expect(home).NotTo(Equal(""))
 
@@ -90,6 +100,13 @@ func initTestContext() *context {
 
 	cxt.karclient = versioned.NewForConfigOrDie(config)
 	cxt.kubeclient = kubernetes.NewForConfigOrDie(config)
+
+	if enableNamespaceAsQueue {
+		cxt.namespaces = []string{"test", "n1", "n2"}
+	} else {
+		cxt.namespaces = []string{"test"}
+		cxt.queues = []string{"test", "n1", "n2"}
+	}
 
 	for _, ns := range cxt.namespaces {
 		_, err = cxt.kubeclient.CoreV1().Namespaces().Create(&v1.Namespace{
@@ -246,7 +263,7 @@ func createJobWithOptions(context *context,
 	containers []v1.Container,
 ) *batchv1.Job {
 	queueJobName := "queuejob.k8s.io"
-	jns, jn := splictJobName(context, name)
+	jns, jn, jq := splictJobName(context, name)
 
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -278,7 +295,7 @@ func createJobWithOptions(context *context,
 		},
 		Spec: arbv1.PodGroupSpec{
 			NumMember: min,
-			Queue:     jns,
+			Queue:     jq,
 		},
 	}
 
@@ -340,7 +357,7 @@ func deleteReplicaSet(ctx *context, name string) error {
 }
 
 func taskReady(ctx *context, jobName string, taskNum int) wait.ConditionFunc {
-	jns, jn := splictJobName(ctx, jobName)
+	jns, jn, _ := splictJobName(ctx, jobName)
 
 	return func() (bool, error) {
 		queueJob, err := ctx.kubeclient.BatchV1().Jobs(jns).Get(jn, metav1.GetOptions{})
@@ -374,7 +391,7 @@ func taskReady(ctx *context, jobName string, taskNum int) wait.ConditionFunc {
 }
 
 func taskNotReady(ctx *context, jobName string, taskNum int) wait.ConditionFunc {
-	jns, jn := splictJobName(ctx, jobName)
+	jns, jn, _ := splictJobName(ctx, jobName)
 
 	return func() (bool, error) {
 		queueJob, err := ctx.kubeclient.BatchV1().Jobs(jns).Get(jn, metav1.GetOptions{})
