@@ -6,7 +6,7 @@ export LOG_LEVEL=3
 
 if [ $(echo $RANDOM%2 | bc) -eq 1 ]
 then
-    enable_namespace_as_queue=true
+    enable_namespace_as_queue=false
 else
     enable_namespace_as_queue=false
 fi
@@ -37,4 +37,4 @@ function cleanup {
 trap cleanup EXIT
 
 # Run e2e test
-go test ./test -v -args ${ENABLE_NAMESPACES_AS_QUEUE}
+go test ./test -v
