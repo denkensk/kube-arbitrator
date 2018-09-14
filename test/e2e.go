@@ -22,8 +22,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"k8s.io/api/core/v1"
-	"k8s.io/kubernetes/pkg/scheduler/algorithm"
+	//"k8s.io/api/core/v1"
+	//"k8s.io/kubernetes/pkg/scheduler/algorithm"
 )
 
 var _ = Describe("E2E Test", func() {
