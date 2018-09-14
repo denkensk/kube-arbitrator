@@ -100,7 +100,7 @@ func initTestContext() *context {
 		cxt.queues = []string{"test", "n1", "n2"}
 	}
 	cxt.enableNamespaceAsQueue = enableNamespaceAsQueue
-	
+
 	for _, ns := range cxt.namespaces {
 		_, err = cxt.kubeclient.CoreV1().Namespaces().Create(&v1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
