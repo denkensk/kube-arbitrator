@@ -6,9 +6,9 @@ export LOG_LEVEL=3
 
 if [ $(echo $RANDOM%2 | bc) -eq 1 ]
 then
-    enable_namespace_as_queue=false
+    enable_namespace_as_queue=true
 else
-    enable_namespace_as_queue=false
+    enable_namespace_as_queue=true
 fi
 
 export ENABLE_NAMESPACES_AS_QUEUE=$enable_namespace_as_queue
