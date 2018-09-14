@@ -40,6 +40,7 @@ import (
 	"github.com/kubernetes-incubator/kube-arbitrator/pkg/client/clientset/versioned"
 	arbapi "github.com/kubernetes-incubator/kube-arbitrator/pkg/scheduler/api"
 	"strconv"
+	"fmt"
 )
 
 var oneMinute = 1 * time.Minute
@@ -259,6 +260,7 @@ func createJobWithOptions(context *context,
 ) *batchv1.Job {
 	queueJobName := "queuejob.k8s.io"
 	jns, jn, jq := splictJobName(context, name)
+	fmt.Printf("jsn: %v , jn: %v,  jq: %v", jns, jn, jq)
 
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
