@@ -82,10 +82,7 @@ func splictJobName(cxt *context, jn string) (string, string, string) {
 }
 
 func initTestContext() *context {
-	enableNamespaceAsQueue, err := strconv.ParseBool(os.Args[0])
-	if err != nil {
-		fmt.Printf("error: %v", err)
-	}
+	enableNamespaceAsQueue, _ := strconv.ParseBool(os.Getenv("ENABLE_NAMESPACES_AS_QUEUE"))
 
 	fmt.Printf("enableNamespaceAsQueue-1: %v", enableNamespaceAsQueue)
 	cxt := &context{}
@@ -104,12 +101,11 @@ func initTestContext() *context {
 
 	if enableNamespaceAsQueue {
 		cxt.namespaces = []string{"test", "n1", "n2"}
-		cxt.enableNamespaceAsQueue = true
 	} else {
 		cxt.namespaces = []string{"test"}
 		cxt.queues = []string{"test", "n1", "n2"}
-		cxt.enableNamespaceAsQueue = false
 	}
+	cxt.enableNamespaceAsQueue = enableNamespaceAsQueue
 	fmt.Printf("enableNamespaceAsQueue-2: %v", enableNamespaceAsQueue)
 
 	for _, ns := range cxt.namespaces {

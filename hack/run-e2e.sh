@@ -3,7 +3,15 @@
 export PATH="${HOME}/.kubeadm-dind-cluster:${PATH}"
 export KA_BIN=_output/bin
 export LOG_LEVEL=3
-export ENABLE_NAMESPACES_AS_QUEUE=false
+
+if [ $(echo $RANDOM%2 | bc) -eq 1 ]
+then
+    enable_namespace_as_queue=true
+else
+    enable_namespace_as_queue=false
+fi
+
+export ENABLE_NAMESPACES_AS_QUEUE=$enable_namespace_as_queue
 
 # start k8s dind cluster
 ./hack/dind-cluster-v1.11.sh up
