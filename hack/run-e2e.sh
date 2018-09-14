@@ -3,7 +3,7 @@
 export PATH="${HOME}/.kubeadm-dind-cluster:${PATH}"
 export KA_BIN=_output/bin
 export LOG_LEVEL=3
-export ENABLE_NAMESPACES_AS_QUEUE=true
+export ENABLE_NAMESPACES_AS_QUEUE=false
 
 # start k8s dind cluster
 ./hack/dind-cluster-v1.11.sh up

@@ -36,11 +36,11 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
+	"fmt"
 	arbv1 "github.com/kubernetes-incubator/kube-arbitrator/pkg/apis/scheduling/v1alpha1"
 	"github.com/kubernetes-incubator/kube-arbitrator/pkg/client/clientset/versioned"
 	arbapi "github.com/kubernetes-incubator/kube-arbitrator/pkg/scheduler/api"
 	"strconv"
-	"fmt"
 )
 
 var oneMinute = 1 * time.Minute
@@ -65,8 +65,8 @@ type context struct {
 	kubeclient *kubernetes.Clientset
 	karclient  *versioned.Clientset
 
-	namespaces []string
-	queues     []string
+	namespaces             []string
+	queues                 []string
 	enableNamespaceAsQueue bool
 }
 
