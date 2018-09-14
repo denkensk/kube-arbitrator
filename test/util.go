@@ -87,6 +87,7 @@ func initTestContext() *context {
 		fmt.Printf("error: %v", err)
 	}
 
+	fmt.Printf("enableNamespaceAsQueue-1: %v", enableNamespaceAsQueue)
 	cxt := &context{}
 	//cxt := &context{
 	//	namespaces: []string{"test", "n1", "n2"},
@@ -103,10 +104,13 @@ func initTestContext() *context {
 
 	if enableNamespaceAsQueue {
 		cxt.namespaces = []string{"test", "n1", "n2"}
+		cxt.enableNamespaceAsQueue = true
 	} else {
 		cxt.namespaces = []string{"test"}
 		cxt.queues = []string{"test", "n1", "n2"}
+		cxt.enableNamespaceAsQueue = false
 	}
+	fmt.Printf("enableNamespaceAsQueue-2: %v", enableNamespaceAsQueue)
 
 	for _, ns := range cxt.namespaces {
 		_, err = cxt.kubeclient.CoreV1().Namespaces().Create(&v1.Namespace{
