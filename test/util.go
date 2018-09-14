@@ -76,8 +76,8 @@ func splictJobName(cxt *context, jn string) (string, string, string) {
 		return cxt.namespaces[0], nss[0], cxt.namespaces[0]
 	}
 	if !cxt.enableNamespaceAsQueue {
-		return cxt.namespaces[0], nss[0], nss[1]
-	}
+		return cxt.namespaces[0], nss[1], nss[0]
+	} 
 	return nss[0], nss[1], nss[0]
 }
 
